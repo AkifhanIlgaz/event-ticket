@@ -3,6 +3,7 @@ package com.zozak.event_ticket.controllers;
 import com.zozak.event_ticket.domain.CreateEventRequest;
 import com.zozak.event_ticket.domain.dtos.CreateEventRequestDto;
 import com.zozak.event_ticket.domain.dtos.CreateEventResponseDto;
+import com.zozak.event_ticket.domain.dtos.GetEventDetailsResponseDto;
 import com.zozak.event_ticket.domain.dtos.ListEventResponseDto;
 import com.zozak.event_ticket.domain.entities.Event;
 import com.zozak.event_ticket.mappers.EventMapper;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,6 +70,20 @@ public class EventController {
         return ResponseEntity.ok(
             events.map(eventMapper::toListEventResponseDto)
         );
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<GetEventDetailsResponseDto> getEventDetails(
+        @AuthenticationPrincipal Jwt jwt,
+        @PathVariable UUID eventId
+    ) {
+        UUID userId = parseUserId(jwt);
+
+        return eventService
+            .getEventForOrganizer(userId, eventId)
+            .map(eventMapper::toGetEventDetailsResponseDto)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     private UUID parseUserId(Jwt jwt) {

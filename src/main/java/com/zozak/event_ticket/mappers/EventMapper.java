@@ -5,6 +5,8 @@ import com.zozak.event_ticket.domain.CreateTicketTypeRequest;
 import com.zozak.event_ticket.domain.dtos.CreateEventRequestDto;
 import com.zozak.event_ticket.domain.dtos.CreateEventResponseDto;
 import com.zozak.event_ticket.domain.dtos.CreateTicketTypeRequestDto;
+import com.zozak.event_ticket.domain.dtos.GetEventDetailsResponseDto;
+import com.zozak.event_ticket.domain.dtos.GetEventDetailsTicketTypesResponseDto;
 import com.zozak.event_ticket.domain.dtos.ListEventResponseDto;
 import com.zozak.event_ticket.domain.dtos.ListEventTicketTypeResponseDto;
 import com.zozak.event_ticket.domain.entities.Event;
@@ -22,6 +24,10 @@ public interface EventMapper {
     CreateEventResponseDto toDto(Event event);
 
     ListEventTicketTypeResponseDto toDto(TicketType ticketType);
-
     ListEventResponseDto toListEventResponseDto(Event event);
+
+    GetEventDetailsTicketTypesResponseDto toGetEventDetailsTicketTypesResponseDto(
+        TicketType ticketType
+    );
+    GetEventDetailsResponseDto toGetEventDetailsResponseDto(Event event);
 }

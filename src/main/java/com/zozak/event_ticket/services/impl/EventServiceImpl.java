@@ -7,6 +7,7 @@ import com.zozak.event_ticket.exceptions.UserNotFoundException;
 import com.zozak.event_ticket.repositories.EventRepository;
 import com.zozak.event_ticket.repositories.UserRepository;
 import com.zozak.event_ticket.services.EventService;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,5 +68,10 @@ public class EventServiceImpl implements EventService {
         Pageable pageable
     ) {
         return eventRepository.findByOrganizerId(organizerId, pageable);
+    }
+
+    @Override
+    public Optional<Event> getEventForOrganizer(UUID organizerId, UUID id) {
+        return eventRepository.findByIdAndOrganizerId(id, organizerId);
     }
 }
