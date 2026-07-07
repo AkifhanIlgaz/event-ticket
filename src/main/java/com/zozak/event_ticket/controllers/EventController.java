@@ -3,16 +3,20 @@ package com.zozak.event_ticket.controllers;
 import com.zozak.event_ticket.domain.CreateEventRequest;
 import com.zozak.event_ticket.domain.dtos.CreateEventRequestDto;
 import com.zozak.event_ticket.domain.dtos.CreateEventResponseDto;
+import com.zozak.event_ticket.domain.dtos.ListEventResponseDto;
 import com.zozak.event_ticket.domain.entities.Event;
 import com.zozak.event_ticket.mappers.EventMapper;
 import com.zozak.event_ticket.services.EventService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +39,7 @@ public class EventController {
             createEventRequestDto
         );
 
-        UUID userId = UUID.fromString(jwt.getSubject());
+        UUID userId = parseUserId(jwt);
 
         Event createdEvent = eventService.createEvent(
             userId,
@@ -47,5 +51,26 @@ public class EventController {
         );
 
         return new ResponseEntity<>(createEventResponseDto, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<ListEventResponseDto>> listEvents(
+        @AuthenticationPrincipal Jwt jwt,
+        Pageable pageable
+    ) {
+        UUID userId = parseUserId(jwt);
+
+        Page<Event> events = eventService.listEventsForOrganizer(
+            userId,
+            pageable
+        );
+
+        return ResponseEntity.ok(
+            events.map(eventMapper::toListEventResponseDto)
+        );
+    }
+
+    private UUID parseUserId(Jwt jwt) {
+        return UUID.fromString(jwt.getSubject());
     }
 }
